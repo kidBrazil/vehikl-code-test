@@ -11,7 +11,7 @@ var express = require('express'),
 // Loading Mongoose
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', true);
-mongoose.connect('mongodb://localhost/TestLot001');
+mongoose.connect('mongodb://localhost/TestLot002');
 
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -44,6 +44,7 @@ Capacity.find({}, function(err, capacity) {
     // Setup Dummy parking lot with 110 Capacity
     var mainLot = new Capacity({
       lot_capacity: 30,
+      base_rate: 3,
       // Lets pretend there are already some cars parked..
       // If this was a real app spots allocated would be zero
       // and there would be some sort of UI to get the capacity entered

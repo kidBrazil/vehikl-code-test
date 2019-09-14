@@ -12,9 +12,13 @@ var IssuedTicket = new Schema({
     type: Boolean,
     default: false
   },
-  paidOn: {
+  paid_on: {
     type: Date,
     default: null
+  },
+  ticket_rate: {
+    type: Number,
+    default: 3
   }
 });
 
