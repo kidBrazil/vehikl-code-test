@@ -5,13 +5,14 @@ var mongoose = require('mongoose'),
   Capacity = mongoose.model('Capacity'),
   Tickets = mongoose.model('Tickets');
 
-// Issue Ticket function ----------------------
+// Issue Ticket function --------------------------------------------
 // This endpoint will trigger a call to the database to
 // check if there are any available spots. If there are available
 // spots the user will receive a ticket number. Otherwise the user
 // will receive a 210 status code and a FALSE for the ticket payload.
 //
-// If the ticket is created successfully the timestamp should be saved to be used for rate calculations later.
+// If the ticket is created successfully the timestamp should
+// be saved to be used for rate calculations later.
 exports.issue_ticket = function(req, res) {
   // Init Variables.
    let lotId = null;
@@ -31,8 +32,8 @@ exports.issue_ticket = function(req, res) {
       // Check if there are still spots free..
       (spots - takenSpots > 0 ) ? createTicket() : denyTicket();
       console.log('CHECKING VACANCY ----------------------------');
-      console.log(spots);
-      console.log(takenSpots);
+      console.log('Capacity:' + spots);
+      console.log('Spots Taken:' + takenSpots);
     }
   });
   // Create Ticket Funcion
@@ -53,33 +54,43 @@ exports.issue_ticket = function(req, res) {
       else {
         // Success...
         // Update capcity count of spots taken.
-        Capacity.findByIdAndUpdate( lotId ,
+        Capacity.update( lotId ,
           {
             $inc: { spots_alocated: 1 }
           },
+          {new: true},
           function (err, capacity) {
             if (err){
                return console.error(err);
             }
             else {
               console.log('Capacity Updated Successfully.');
+              console.log(capacity);
+              console.log("New Ticket Issued  -----------------------");
+              console.log("Ticket ID: " + ticket.id);
+              res.send(ticket);
             }
           }
         );
-        console.log("New Ticket Issued  -----------------------");
-        console.log("Ticket ID: " + ticket.id);
-        res.send(ticket);
       }
     });
   }
   // Deny Ticket Function
   function denyTicket() {
-    console.log('NO CAPCITY -----------------------------');
+    console.error('NO CAPCITY -----------------------------');
     res.json({ message: 'Sorry but there is no spots left, please try again later!' });
   }
 };
 
 exports.total_owed = function(req, res) {
+  // Issue Ticket function --------------------------------------------
+  // This endpoint will trigger a call to the database
+  // to determine when the ticket was created.
+  // It will then check that against the current time
+  // and generate a cost estimate based on the preestablished rates.
+  // The endpoint will then return the amount owed in dollars.
+  //--------------------------------------------------------------------
+
   console.log('Ticked Owed');
   res.json({ message: 'Total Owed' });
 };

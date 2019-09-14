@@ -10,7 +10,8 @@ var express = require('express'),
 
 // Loading Mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/ParkingLot004');
+mongoose.set('useFindAndModify', true);
+mongoose.connect('mongodb://localhost/TestLot001');
 
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
