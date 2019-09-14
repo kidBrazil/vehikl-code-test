@@ -28,13 +28,13 @@ exports.issue_ticket = function(req, res) {
     else {
       // Success...
       let spots = capacity[0].lot_capacity,
-      takenSpots = capacity[0].spots_alocated,
+          takenSpots = capacity[0].spots_alocated,
       // Update Variables
       lotId = capacity[0].id;
       baseRate = capacity[0].base_rate;
       // Check if there are still spots free..
       (spots - takenSpots > 0 ) ? createTicket() : denyTicket();
-      console.log('CHECKING VACANCY ----------------------------');
+      console.log('[ CHECKING VACANCY ] ----------------------------');
       console.log('Capacity:' + spots);
       console.log('Spots Taken:' + takenSpots);
     }
@@ -68,9 +68,8 @@ exports.issue_ticket = function(req, res) {
                return console.error(err);
             }
             else {
-              console.log('Capacity Updated Successfully.');
-              console.log(capacity);
-              console.log("New Ticket Issued  -----------------------");
+              console.log('[ Capacity Updated Successfully. ]');
+              console.log("[ New Ticket Issued ]  -----------------------");
               console.log("Ticket ID: " + ticket.id);
               res.send(ticket);
             }
@@ -81,7 +80,7 @@ exports.issue_ticket = function(req, res) {
   }
   // Deny Ticket Function -----------------------------------------------------
   function denyTicket() {
-    console.error('NO CAPCITY -----------------------------');
+    console.error('[NO VACANCY] -----------------------------');
     res.json({ message: 'Sorry but there is no spots left, please try again later!' });
   }
 };
@@ -97,28 +96,58 @@ exports.total_owed = function(req, res) {
 
   // Variables
   let ticketId = req.params.ticket,
-      requestTime = Date.now(),
-      createdTime = null,
-      ticketRate = null;
+      requestTime = Date.now();
   // Get current Lot Capacity ------------------------------------
   // Will set vacancy to true/false based on capcity left.
   Tickets.find({_id: ticketId}, function(err, ticket) {
+    // Variables
+    let createdTime = null,
+        ticketRate = null;
+
     if (err) {
       // Error ...
       res.send(err);
     }
     else {
       // Success
-      calculateRate();
+      createdTime = ticket[0].created;
+      ticketRate = ticket[0].ticket_rate;
+      // Calculate the rate.
+      res.json({ total: calculateRate( ticketRate, createdTime, requestTime ) });
     }
   });
 
-  function calculateRate() {
-    console.log('Calculating');
-    res.json({ message: 'Calculating' });
+  // Calculate The Rate ....
+  function calculateRate(rate, created, requested) {
+    // Calculate Rate Function ----------------------------------------
+    // Takes in 3 arguments in order to calculate the amount owed by the client.
+    //
+    // rate: Comes directly from the ticket and represents the dollars / hour cost.
+    // created: Receives date from database in Timestamp so must be converted to millis.
+    // requested: Comes in as standard millis ready to calculate.
+    var total = null;
+    // Convert Created to Millis.
+    created = created.getTime();
+    // Get the difference in time in minutes
+    let delta = Math.ceil( (requested - created) / 60000);
+    let rateMinute = rate / 60;
+
+
+    // Over 1 Hour...Less than 3
+    if ( delta > 60 && delta < 119 ) {
+      rateMinute = (rateMinute * 1.5);
+    }
+    // Over 3 Hours...Less than 6
+    else if ( delta >= 120 && delta < 360) {
+      rateMinute = (rateMinute * 2.25)
+    }
+    // All Day
+    else if ( delta > 361) {
+      rateMinute = (rateMinute * 3.5)
+    }
+    // Return Total...
+    return total = (delta * rateMinute).toFixed(2);
   }
-  console.log('Ticked Owed');
-  console.log(req.params.ticket);
 };
 
 exports.pay_ticket = function(req, res) {
