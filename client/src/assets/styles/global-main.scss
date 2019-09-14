@@ -1,0 +1,108 @@
+/*-----------------------------------------]
+
+	[Global Main Stylesheet] - V 0.0.1
+	Created On: Dec - 28 - 2016 - Ubuntu 16.04
+	Updated On: Aug - 10 - 2018 - Ubuntu 18.04
+
+	Desc: Main stylesheet comprises the
+	imports necessary to style the website
+	and avoids repetition inside the components
+
+----------------------------------------]*/
+
+/*----
+ Reset
+-----*/
+@import 'reset.scss';
+
+/*----
+	global variables
+-----*/
+@import './variables.scss';
+
+/*----
+ Mdev Boilerplate
+-----*/
+@import '~@moreira-development/crowbar-sass/styles/global-main.scss';
+
+/*----
+  Flex
+-----*/
+@import './flex.scss';
+
+/*----
+  Mixins
+-----*/
+@import './mixins.scss';
+
+/*----
+	Global Typography
+-----*/
+@import './typography.scss';
+
+/*----
+ 	Utilities
+-----*/
+@import './utilities.scss';
+
+/*---
+  Scaffolding
+-----*/
+@import './scaffolding.scss';
+
+/*---
+  icons
+-----*/
+@import './icons.scss';
+
+/*----
+  Buttons
+-----*/
+@import './buttons.scss';
+
+/*----
+  Decorations
+-----*/
+@import './decorations.scss';
+
+/*----
+  Animations
+-----*/
+@import './animations.scss';
+
+/*----
+  Forms
+-----*/
+@import './forms.scss';
+
+/*----
+	FontAwesome
+-----*/
+// Font awesome requires the main fontawesome.scss to work
+// but allows you to tailor how many families you load just like a font.
+
+// [FontAwesome Loader] --------- ( Required )
+@import '~@fortawesome/fontawesome-pro/scss/fontawesome.scss';
+// Do not change, this overrides the font path so Webpack can find them.
+$fa-font-path: '~@fortawesome/fontawesome-pro/webfonts';
+
+// ----------------------------------------------
+// [][][ PLEASE DISABLE ANY UNUSED FAMILIES ][][]
+// ----------------------------------------------
+// [Brands] ---------
+@import '~@fortawesome/fontawesome-pro/scss/brands.scss';
+
+// [Light] ----------
+@import '~@fortawesome/fontawesome-pro/scss/light.scss';
+
+// [Regular] --------
+@import '~@fortawesome/fontawesome-pro/scss/regular.scss';
+
+// [Solid] ----------
+@import '~@fortawesome/fontawesome-pro/scss/solid.scss';
+
+/*----
+  Print
+-----*/
+@import './print.scss';
+

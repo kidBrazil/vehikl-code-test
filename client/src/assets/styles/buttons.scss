@@ -1,0 +1,52 @@
+/*-------------------------------------
+ *	BUTTONS MASTER STYLES
+ *-------------------------------------
+ *
+ *	Stylesheet dedicated to all button
+ *	styles including colour and typography
+ *
+/-------------------------------------*/
+
+/* Base Button */
+// TODO - Replace blackmesa-BTN
+.blackmesa-btn {
+  width: auto;
+  padding: 10px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .4s;
+  position: relative;
+  vertical-align: middle;
+
+  &:before,
+  &:after {
+    @include pseudo();
+    width: 100%;
+    height: 100%;
+  }
+
+  &:before {
+    top: 0;
+    left: 0;
+  }
+
+  &:after {
+    bottom: 0;
+    right: 0;
+  }
+
+  @media #{$portrait} {
+    padding: 15px 20px;
+  }
+
+  @media #{$tablet-lnd-only} {
+    padding: 10px 15px;
+  }
+
+  @media #{$phone-only} {
+    padding: 8px 10px;
+    letter-spacing: 1px;
+  }
+}

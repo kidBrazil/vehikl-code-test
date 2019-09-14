@@ -1,0 +1,34 @@
+{
+  "name": "vehikl-codetest-api",
+  "version": "0.0.1",
+  "description": "Simple API to serve as the backbone of a Parking lot application. Emits tickets, checks for available spots and charges customers based on predetermined rates.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kidBrazil/vehikl-code-test.git"
+  },
+  "keywords": [
+    "Node",
+    "Express",
+    "Mongo",
+    "Mongoose",
+    "Code",
+    "test"
+  ],
+  "author": "Lucas Moreira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kidBrazil/vehikl-code-test/issues"
+  },
+  "homepage": "https://github.com/kidBrazil/vehikl-code-test#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.2"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.7.1"
+  }
+}
