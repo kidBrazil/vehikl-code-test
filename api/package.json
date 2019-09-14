@@ -4,7 +4,7 @@
   "description": "Simple API to serve as the backbone of a Parking lot application. Emits tickets, checks for available spots and charges customers based on predetermined rates.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
