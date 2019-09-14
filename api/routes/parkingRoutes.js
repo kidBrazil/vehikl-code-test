@@ -2,13 +2,15 @@
 module.exports = function(app) {
   var parkingController = require('../controllers/parkingController');
 
-  // Get Ticket if space available
+  // Get Ticket Endpoint
   app.route('/tickets')
     .post(parkingController.issue_ticket);
 
+  // Return Amount Owed Endpoint
   app.route('/tickets/:ticket')
     .get(parkingController.total_owed);
 
+  // Pay Ticket Endpoint
   app.route('/payments/:ticket')
     .get(parkingController.pay_ticket);
 };
