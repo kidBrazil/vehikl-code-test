@@ -1,12 +1,12 @@
 {
    "index": "index.html",
-   "region": "us-west-2",
+   "region": "us-east-1",
    "uploadDir": "dist",
    "prefix": "",
    "exclude": [],
    "corsConfiguration": [],
    "enableCloudfront": false,
    "retries": 20,
-   "domain": "boiltest",
+   "domain": "vehikl-code-test",
    "configFile": ".s3-website.json"
 }
