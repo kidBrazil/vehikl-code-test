@@ -10,11 +10,10 @@
       button.blk-base-btn(v-on:click="getTicket")
         |Get Ticket
       .blk-ticket(v-if="ticket")
-        |Your Ticket number is {{ticket}}
+        |Your Ticket number is: {{ticket}}
+      .blk-ticket(v-if="message")
+        |{{message}}
 </template>
-
-
-
 
 <script>
 
@@ -32,6 +31,11 @@ export default{
   data: function(){
     return {
       ticket: false,
+      message: false,
+      ticketId: null,
+      ccNumber: null,
+      ccSecNum: null,
+      ccDate: null
     };
   },
   // Meta SEO Function
@@ -52,8 +56,32 @@ export default{
   },
 
   methods: {
-    getTicket() {
-
+    // Provision New Ticket!
+    getTicket(e) {
+      e.preventDefault();
+      // Collect fields and serialize them
+      axios.post('http://localhost:3000/tickets', {})
+      // Success
+      .then((response) => {
+        console.log(response);
+        // Ticket Created successfully.
+        if (response.data.created) {
+          // Reset message...
+          this.message = false;
+          this.ticket =  response.data._id;
+        }
+        // Ticket failed to create.
+        else {
+          // Reset Ticket
+          this.ticket = false;
+          this.message = response.data.message;
+        }
+      })
+      // Failure
+      .catch((error) => {
+        console.log(error);
+        alertify.error('Sorry but something went wrong with the server!');
+      });
     }
   },
 };
