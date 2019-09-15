@@ -35,7 +35,7 @@ exports.issue_ticket = function(req, res) {
       lotId = capacity[0].id;
       baseRate = capacity[0].base_rate;
       // Check if there are still spots free..
-      (spots - takenSpots > 0 ) ? createTicket() : denyTicket();
+      (spots - takenSpots > 0 ) ? createTicket(lotId, baseRate) : denyTicket();
       console.log('[ CHECKING VACANCY ] ----------------------------');
       console.log('Capacity:' + spots);
       console.log('Spots Taken:' + takenSpots);
@@ -43,13 +43,15 @@ exports.issue_ticket = function(req, res) {
   });
 
   // Create Ticket Funcion ------------------------------------------
-  function createTicket() {
+  function createTicket(parkingLot, rate) {
+    console.log('CREATING Ticket');
     // Model Ticket - We only need creation time at this stage
     var ticket = new Tickets({
       // Could potentially add other data here in the future,
       // license plate from a reader.. that type of thing.
       created: Date.now(),
-      ticket_rate: baseRate
+      ticket_rate: rate,
+      lot_id: parkingLot
     });
     // Save ticket to DB
     ticket.save(function (err, ticket) {
@@ -60,7 +62,7 @@ exports.issue_ticket = function(req, res) {
       else {
         // Success...
         // Update capcity count of spots taken.
-        Capacity.update( lotId ,
+        Capacity.updateOne( lotId ,
           {
             $inc: { spots_alocated: 1 }
           },
@@ -100,6 +102,7 @@ exports.pay_ticket = function(req, res) {
   let ticketId = req.params.ticket,
       requestTime = Date.now(),
       totalOwed = null,
+      lotId = null,
       reqUrl = req.url;
   // Get current Lot Capacity ------------------------------------
   // Will set vacancy to true/false based on capcity left.
@@ -116,6 +119,7 @@ exports.pay_ticket = function(req, res) {
       // Success
       createdTime = ticket[0].created;
       ticketRate = ticket[0].ticket_rate;
+      lotId = ticket[0].lot_id;
       // Calculate the rate.
       totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
 
@@ -137,7 +141,43 @@ exports.pay_ticket = function(req, res) {
               expiry = req.body.cc_expiry;
           // Process Payment
           let paymentResponse = helpers.process_payment(ccNumber, cvcNumber, expiry, totalOwed);
-          // Send response...
+          // Check response and update capacity...
+          if (paymentResponse.processed) {
+            // Success...
+            // Update capcity count of spots taken.
+            Capacity.update( lotId ,
+              {
+                $inc: { spots_alocated: -1 }
+              },
+              {new: true},
+              function (err, capacity) {
+                if (err){
+                   return console.error(err);
+                }
+                else {
+                  console.log('Updated Lot Capcity...');
+                }
+              }
+            );
+            // Update Ticket...
+            Tickets.update( ticketId ,
+              {
+                paid: true,
+                paid_on: Date.now()
+              },
+              {new: true},
+              function (err, capacity) {
+                if (err){
+                   return console.error(err);
+                }
+                else {
+                  console.log('Updated Ticket...');
+                }
+              }
+            );
+          }
+
+          // Return response object...
           res.json({
             payment_fullfilled: paymentResponse.processed,
             payment_error: paymentResponse.error
