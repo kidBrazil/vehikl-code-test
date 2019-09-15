@@ -197,7 +197,9 @@ export default{
       })
       // Success
       .then((response) => {
+        console.log(response);
         this.paid = response.data.payment_fullfilled;
+        this.totalPaid = response.data.payment_total;
       })
       // Failure
       .catch((error) => {
