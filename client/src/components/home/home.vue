@@ -1,11 +1,11 @@
 <template lang="pug">
   //- Wrapper Container
   section.blk-main-content.u-text-center
-    h1
+    h1.u-uppercase
       |Parking Lot App
 
     //- Issue New Tickets
-    section.blk-issue-tickets
+    section.blk-section
       h2
         |Issue New Tickets
       button.blk-base-btn(v-on:click.prevent="getTicket")
@@ -16,8 +16,8 @@
         |{{message}}
 
     //- Check Total Owed
-    section.blk-check-total
-      h2
+    section.blk-section
+      h2.u-uppercase
         |Check Total Owed:
       .blk-input-group
         .blk-input-label
@@ -38,8 +38,8 @@
         |Your Total is: ${{total}}
 
     //- Pay Card
-    section.blk-pay-total
-      h2
+    section.blk-section
+      h2.u-uppercase
         |Pay Ticket:
 
       .blk-input-group
@@ -173,52 +173,90 @@ export default{
 
     // Get Ticket Costs!
     getTotal() {
-      // Collect fields and serialize them
-      axios.get('http://localhost:3000/tickets/' + this.ticketId , {})
-      // Success
-      .then((response) => {
-        this.total = response.data.total;
-      })
-      // Failure
-      .catch((error) => {
-        console.log(error);
-        alertify.error('Sorry but something went wrong with the server!');
-      });
+      // [ VALIDATION ] -------------------------------------------
+      // Validates Ticket ID against MongoDB Object ID since that is our schema.
+      let validate = /^[a-f\d]{24}$/i;
+      validate = new RegExp(validate);
+      // Test...
+      if ( validate.test(this.ticketId) ) {
+        axios.get('http://localhost:3000/tickets/' + this.ticketId , {})
+        // Success
+        .then((response) => {
+          this.total = response.data.total;
+        })
+        // Failure
+        .catch((error) => {
+          console.log(error);
+          alertify.error('Sorry but something went wrong with the server!');
+        });
+      }
+      else {
+        alertify.error('Sorry but that Ticket Number is not valid.');
+      }
     },
 
     // Get Ticket Costs!
     payTicket() {
-      // Collect fields and serialize them
-      axios.post('http://localhost:3000/payments/' + this.ticketId ,
-      {
-        "cc_number": this.ccNumber,
-        "cc_expiry": this.ccDate,
-        "cc_cvc": this.ccSecNum
-      })
-      // Success
-      .then((response) => {
-        console.log(response);
-        this.paid = response.data.payment_fullfilled;
-        this.totalPaid = response.data.payment_total;
-      })
-      // Failure
-      .catch((error) => {
-        console.log(error);
-        alertify.error('Sorry but something went wrong with the server!');
-      });
+      // [VALIDATION] ------------------------------------------------------
+      // Since CC is being validated in the backend, here we will just check
+      // to make sure they are present and go from there. Typically you would
+      // want some regex on the date and on the CVC before submission as well.
+      if (this.ccNumber, this.ccDate, this.ccSecNum) {
+        axios.post('http://localhost:3000/payments/' + this.ticketId ,
+          {
+            "cc_number": this.ccNumber,
+            "cc_expiry": this.ccDate,
+            "cc_cvc": this.ccSecNum
+          })
+          // Success
+          .then((response) => {
+            console.log(response);
+            this.paid = response.data.payment_fullfilled;
+            this.totalPaid = response.data.payment_total;
+          })
+          // Failure
+          .catch((error) => {
+            console.log(error);
+            alertify.error('Sorry but something went wrong with the server!');
+          });
+      }
+      else {
+        alertify.error('Sorry but you are missing information for payment processing.');
+      }
     }
   },
 };
 </script>
-
-
 
 <style lang="scss">
 
 /*-------------------------------------*/
 /* HOME Component Styles
 /--------------------------------------*/
+.blk-main-content {
+  background: #f2f2f2;
+  width: 90%;
+  @include center(both);
 
+  h1 {
+    width: 100%;
+    padding: 20px 0;
+    color: $white;
+    background: #5d5d5d;
+    margin-bottom: 0;
+  }
+
+  h2 {
+    width: 100%;
+    padding: 10px 0;
+    background: #c1c1c1;
+  }
+}
+
+.blk-section {
+  width: 100%;
+  padding-bottom: 20px;
+}
 
 /*--------------------------------------*/
 
