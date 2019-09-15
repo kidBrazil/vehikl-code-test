@@ -47,6 +47,15 @@ npm run dev
 
 ```
 
+## Custom Docker Image
+A custom docker image has been provisioned with the code in this repository and
+it is available by running.
+
+```bash
+# Docker will pull the image from repo!
+docker run  moreiradev/vehikl-codetest-api
+```
+
 ## Deploying project online
 TODO
 
