@@ -57,6 +57,12 @@ exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
       cardRegex: /^(?:5[1-5][0-9]{14})$/
     },
   ]
+  // CVC validation
+  let cvcModel = /^[0-9]{3,4}$/,
+      cvcRegEx = new RegExp(cvcModel);
+  // Date model works for a few different date formats, requires processing to normalize
+  let dateModel = /^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$/,
+      dateRegEx = new RegExp(dateModel);
 
   // Loop through models and compare
   for (let i=0; i <= cardModels.length -1; i++) {
@@ -72,7 +78,7 @@ exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
     }
   }
   // If valid... Call Payment processor and make exchange
-  if ( validCard ) {
+  if ( validCard && cvcRegEx.test(cvcNumber) && dateRegEx.test(expiry) ) {
     // Other arguments would be passed in with this function
     // were it a real payment processor.
     return processPayment(ccNumber, cvcNumber, expiry, total);
@@ -85,7 +91,6 @@ exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
       error: 'Invalid Card, could not process.'
     };
   }
-
   // Process Payment ----------------------------------------
   // In this step we would usually communicate with a payment provider
   // exchange tokens and CC information via encrypted connection
