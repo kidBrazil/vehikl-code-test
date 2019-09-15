@@ -14,7 +14,7 @@ npm install
 # Run Express server (://localhost:3000)
 npm run start
 
-# On a new terminal, go to /vehikl-code-test/api
+# On a new terminal, go to /vehikl-code-test/client
 # Login to NPM
 npm login
 

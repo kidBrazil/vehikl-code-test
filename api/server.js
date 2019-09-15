@@ -4,17 +4,20 @@ var express = require('express'),
   port = process.env.PORT || 3000;
   mongoose = require('mongoose'),
   Capacity = require('./models/lotCapacityModel'),
+  cors = require('cors'),
   Tickets = require('./models/ticketModel'),
   bodyParser = require('body-parser');
 
 // Loading Mongoose
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', true);
-mongoose.connect('mongodb://localhost/TestLot005');
+mongoose.connect('mongodb://localhost/TestLot0014');
 
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// Enable CORS
+app.use(cors());
 
 // Load Routes
 var routes = require('./routes/parkingRoutes');

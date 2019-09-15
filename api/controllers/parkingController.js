@@ -153,6 +153,8 @@ exports.pay_ticket = function(req, res) {
           res.json({ message: 'Ticket is already Paid.' });
         }
         else {
+          // Calculate the rate.
+          totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
           // Check that the request contains something in the body..
           if (Object.keys(req.body).length > 0) {
             // Variables
@@ -199,7 +201,8 @@ exports.pay_ticket = function(req, res) {
             // Return response object...
             res.json({
               payment_fullfilled: paymentResponse.processed,
-              payment_error: paymentResponse.error
+              payment_error: paymentResponse.error,
+              payment_total: totalOwed
             });
           }
           // URL Params missing....
