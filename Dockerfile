@@ -1,7 +1,7 @@
-FROM node:10
-WORKDIR /app
-COPY api/package.json /app
+FROM node:boron
+WORKDIR /usr/app
+COPY api/package.json /usr/app
 RUN npm install
-COPY ./api /app
-CMD npm run start
+COPY api /usr/app
+CMD npm start
 EXPOSE 3000
