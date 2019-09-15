@@ -4,15 +4,100 @@
     h1
       |Parking Lot App
 
+    //- Issue New Tickets
     section.blk-issue-tickets
       h2
         |Issue New Tickets
-      button.blk-base-btn(v-on:click="getTicket")
+      button.blk-base-btn(v-on:click.prevent="getTicket")
         |Get Ticket
       .blk-ticket(v-if="ticket")
         |Your Ticket number is: {{ticket}}
       .blk-ticket(v-if="message")
         |{{message}}
+
+    //- Check Total Owed
+    section.blk-check-total
+      h2
+        |Check Total Owed:
+      .blk-input-group
+        .blk-input-label
+          |Enter Ticket Number:
+        input(
+          data-required
+          class="blk-input-field"
+          v-model="ticketId"
+          name="Ticket Number"
+          aria-required="true"
+          aria-label="Enter Ticket Number"
+          placeholder="Ticket #:"
+          )
+      button.blk-base-btn(v-on:click.prevent="getTotal")
+        |Get Total
+
+      .blk-total(v-if="total")
+        |Your Total is: ${{total}}
+
+    //- Pay Card
+    section.blk-pay-total
+      h2
+        |Pay Ticket:
+
+      .blk-input-group
+        .blk-input-label
+          |Enter Ticket Number:
+        input(
+          data-required
+          class="blk-input-field"
+          v-model="ticketId"
+          name="Ticket Number"
+          aria-required="true"
+          aria-label="Enter Ticket Number"
+          placeholder="Ticket #:"
+          )
+
+      .blk-input-group
+        .blk-input-label
+          |Credit Card:
+        input(
+          data-required
+          class="blk-input-field"
+          v-model="ccNumber"
+          name="Ticket Number"
+          aria-required="true"
+          aria-label="Enter Credit Card Number"
+          placeholder="Credit Card Number:"
+          )
+
+      .blk-input-group
+        .blk-input-label
+          |Expiry Date:
+        input(
+          data-required
+          class="blk-input-field"
+          v-model="ccDate"
+          name="Ticket Number"
+          aria-required="true"
+          aria-label="Enter Ticket Number"
+          placeholder="Expiry Date (MMYY)"
+          )
+
+      .blk-input-group
+        .blk-input-label
+          |CVC Number:
+        input(
+          data-required
+          class="blk-input-field"
+          v-model="ccSecNum"
+          name="Ticket Number"
+          aria-required="true"
+          aria-label="Enter CVC Number"
+          placeholder="CVC"
+          )
+
+      button.blk-base-btn(v-on:click.prevent="payTicket")
+        |Pay Ticket
+      .blk-paid(v-if="paid")
+        |Thank you for your payment of: ${{totalPaid}}
 </template>
 
 <script>
@@ -32,6 +117,9 @@ export default{
     return {
       ticket: false,
       message: false,
+      total: false,
+      totalPaid: null,
+      paid: false,
       ticketId: null,
       ccNumber: null,
       ccSecNum: null,
@@ -57,8 +145,7 @@ export default{
 
   methods: {
     // Provision New Ticket!
-    getTicket(e) {
-      e.preventDefault();
+    getTicket() {
       // Collect fields and serialize them
       axios.post('http://localhost:3000/tickets', {})
       // Success
@@ -76,6 +163,41 @@ export default{
           this.ticket = false;
           this.message = response.data.message;
         }
+      })
+      // Failure
+      .catch((error) => {
+        console.log(error);
+        alertify.error('Sorry but something went wrong with the server!');
+      });
+    },
+
+    // Get Ticket Costs!
+    getTotal() {
+      // Collect fields and serialize them
+      axios.get('http://localhost:3000/tickets/' + this.ticketId , {})
+      // Success
+      .then((response) => {
+        this.total = response.data.total;
+      })
+      // Failure
+      .catch((error) => {
+        console.log(error);
+        alertify.error('Sorry but something went wrong with the server!');
+      });
+    },
+
+    // Get Ticket Costs!
+    payTicket() {
+      // Collect fields and serialize them
+      axios.post('http://localhost:3000/payments/' + this.ticketId ,
+      {
+        "cc_number": this.ccNumber,
+        "cc_expiry": this.ccDate,
+        "cc_cvc": this.ccSecNum
+      })
+      // Success
+      .then((response) => {
+        this.paid = response.data.payment_fullfilled;
       })
       // Failure
       .catch((error) => {
