@@ -6,18 +6,18 @@
 
     //- Issue New Tickets
     section.blk-section
-      h2
+      h3.u-uppercase
         |Issue New Tickets
       button.blk-base-btn(v-on:click.prevent="getTicket")
         |Get Ticket
       .blk-ticket(v-if="ticket")
-        |Your Ticket number is: {{ticket}}
-      .blk-ticket(v-if="message")
+        |TICKET NUMBER: {{ticket}}
+      .blk-repsponse(v-if="message")
         |{{message}}
 
     //- Check Total Owed
     section.blk-section
-      h2.u-uppercase
+      h3.u-uppercase
         |Check Total Owed:
       .blk-input-group
         .blk-input-label
@@ -34,12 +34,12 @@
       button.blk-base-btn(v-on:click.prevent="getTotal")
         |Get Total
 
-      .blk-total(v-if="total")
+      .blk-repsponse(v-if="total")
         |Your Total is: ${{total}}
 
     //- Pay Card
     section.blk-section
-      h2.u-uppercase
+      h3.u-uppercase
         |Pay Ticket:
 
       .blk-input-group
@@ -96,7 +96,7 @@
 
       button.blk-base-btn(v-on:click.prevent="payTicket")
         |Pay Ticket
-      .blk-paid(v-if="paid")
+      .blk-repsponse(v-if="paid")
         |Thank you for your payment of: ${{totalPaid}}
 </template>
 
@@ -246,16 +246,38 @@ export default{
     margin-bottom: 0;
   }
 
-  h2 {
+  h3 {
     width: 100%;
     padding: 10px 0;
     background: #c1c1c1;
   }
 }
 
+.blk-ticket {
+  width: 50%;
+  background: orange;
+  margin: 25px auto 0;
+  border-radius: 10px;
+  font-size: 24px;
+  margin-top: 25px;
+  padding: 25px 10px;
+  box-shadow: 5px 5px 10px rgba(0,0,0,.4);
+  color: #5d5d5d;
+}
+
 .blk-section {
   width: 100%;
   padding-bottom: 20px;
+}
+
+.blk-repsponse {
+  margin: 25px auto 0;
+  width: 100%;
+  padding: 20px 0;
+  background: green;
+  margin-bottom: -20px;
+  color: $white;
+  font-size: 18px;
 }
 
 /*--------------------------------------*/
