@@ -5,6 +5,8 @@ var mongoose = require('mongoose'),
   Capacity = mongoose.model('Capacity'),
   Tickets = mongoose.model('Tickets');
 
+var helpers = require('../helpers/helpers');
+
 // Issue Ticket function --------------------------------------------
 // This endpoint will trigger a call to the database to
 // check if there are any available spots. If there are available
@@ -85,7 +87,7 @@ exports.issue_ticket = function(req, res) {
   }
 };
 
-exports.total_owed = function(req, res) {
+exports.pay_ticket = function(req, res) {
   // Issue Ticket function --------------------------------------------
   // This endpoint will trigger a call to the database
   // to determine when the ticket was created.
@@ -94,9 +96,11 @@ exports.total_owed = function(req, res) {
   // The endpoint will then return the amount owed in dollars.
   //--------------------------------------------------------------------
 
-  // Variables
+  // Variables -- In a real world scenario ticket number would be validated.
   let ticketId = req.params.ticket,
-      requestTime = Date.now();
+      requestTime = Date.now(),
+      totalOwed = null,
+      reqUrl = req.url;
   // Get current Lot Capacity ------------------------------------
   // Will set vacancy to true/false based on capcity left.
   Tickets.find({_id: ticketId}, function(err, ticket) {
@@ -113,44 +117,42 @@ exports.total_owed = function(req, res) {
       createdTime = ticket[0].created;
       ticketRate = ticket[0].ticket_rate;
       // Calculate the rate.
-      res.json({ total: calculateRate( ticketRate, createdTime, requestTime ) });
+      totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
+
+      // Respond to Ticket URI.
+      if ( reqUrl.indexOf('tickets') > -1) {
+        res.json(
+          {
+            total: totalOwed
+          }
+        );
+      }
+      // Respond to Payments
+      else if (reqUrl.indexOf('payments') > -1) {
+        // Check that the request contains something in the body..
+        if (Object.keys(req.body).length > 0) {
+          // Variables
+          let ccNumber = req.body.cc_number,
+              cvcNumber = req.body.cc_cvc,
+              expiry = req.body.cc_expiry;
+          // Process Payment
+          let paymentResponse = helpers.process_payment(ccNumber, cvcNumber, expiry, totalOwed);
+          // Send response...
+          res.json({
+            payment_fullfilled: paymentResponse.processed,
+            payment_error: paymentResponse.error
+          });
+        }
+        else {
+          console.error('Request Body is missing.');
+          res.json({ message: 'Request Body is missing.' });
+        }
+      }
+      // Catch All..
+      else {
+        console.error('Invalid URL, please review and try again.');
+        res.json({ message: 'Invalid URL, please review and try again.' });
+      }
     }
   });
-
-  // Calculate The Rate ....
-  function calculateRate(rate, created, requested) {
-    // Calculate Rate Function ----------------------------------------
-    // Takes in 3 arguments in order to calculate the amount owed by the client.
-    //
-    // rate: Comes directly from the ticket and represents the dollars / hour cost.
-    // created: Receives date from database in Timestamp so must be converted to millis.
-    // requested: Comes in as standard millis ready to calculate.
-    var total = null;
-    // Convert Created to Millis.
-    created = created.getTime();
-    // Get the difference in time in minutes
-    let delta = Math.ceil( (requested - created) / 60000);
-    let rateMinute = rate / 60;
-
-
-    // Over 1 Hour...Less than 3
-    if ( delta > 60 && delta < 119 ) {
-      rateMinute = (rateMinute * 1.5);
-    }
-    // Over 3 Hours...Less than 6
-    else if ( delta >= 120 && delta < 360) {
-      rateMinute = (rateMinute * 2.25)
-    }
-    // All Day
-    else if ( delta > 361) {
-      rateMinute = (rateMinute * 3.5)
-    }
-    // Return Total...
-    return total = (delta * rateMinute).toFixed(2);
-  }
-};
-
-exports.pay_ticket = function(req, res) {
-  console.log('Ticked Paid');
-  res.json({ message: 'Ticked Paid' });
 };
