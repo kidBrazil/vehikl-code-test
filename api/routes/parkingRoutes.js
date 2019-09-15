@@ -12,5 +12,5 @@ module.exports = function(app) {
 
   // Pay Ticket Endpoint
   app.route('/payments/:ticket')
-    .get(parkingController.pay_ticket);
+    .post(parkingController.pay_ticket);
 };

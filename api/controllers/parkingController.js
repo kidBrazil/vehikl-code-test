@@ -104,9 +104,10 @@ exports.pay_ticket = function(req, res) {
       lotId = null,
       // Flag for checking if ticket was previously paid
       ticketPaid = false,
+      // reqUrl will route functionality down the line
       reqUrl = req.url;
-  // Get current Lot Capacity ------------------------------------
-  // Will set vacancy to true/false based on capcity left.
+
+  // [Get Ticket Information] ------------------------------------
   Tickets.find({_id: ticketId}, function(err, ticket) {
     // Variables
     let createdTime = null,
@@ -123,7 +124,7 @@ exports.pay_ticket = function(req, res) {
       lotId = ticket[0].lot_id;
       ticketPaid = ticket[0].paid;
 
-      // Respond to Ticket URI.
+      // [ /tickets Endpoint ] -------------------------------------------------
       if ( reqUrl.indexOf('tickets') > -1) {
         // If ticket is already paid.. return 0
         if ( ticketPaid ) {
@@ -144,7 +145,7 @@ exports.pay_ticket = function(req, res) {
           );
         }
       }
-      // Respond to Payments
+      // [ /payments Endpoint ] -------------------------------------------------
       else if (reqUrl.indexOf('payments') > -1) {
         // If ticket already paid..
         if ( ticketPaid ) {
@@ -201,13 +202,14 @@ exports.pay_ticket = function(req, res) {
               payment_error: paymentResponse.error
             });
           }
+          // URL Params missing....
           else {
             console.error('Request Body is missing.');
             res.json({ message: 'Request Body is missing.' });
           }
         }
       }
-      // Catch All..
+      // [No Endpoint Match] ---------------------------------------------------
       else {
         console.error('Invalid URL, please review and try again.');
         res.json({ message: 'Invalid URL, please review and try again.' });

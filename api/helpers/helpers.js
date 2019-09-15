@@ -1,7 +1,7 @@
 'use strict';
 
 exports.calculate_rate = function(rate, created, requested) {
-  // Calculate Rate Function ----------------------------------------
+  // [Calculate Rate Function] ----------------------------------------
   // Takes in 3 arguments in order to calculate the amount owed by the client.
   //
   // rate: Comes directly from the ticket and represents the dollars / hour cost.
@@ -32,11 +32,15 @@ exports.calculate_rate = function(rate, created, requested) {
 }
 
 exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
-  // Issue Ticket function --------------------------------------------
+  // [Process Payment ] --------------------------------------------
   // This is a mock function of a CC processing step. There will be no real
   // credit card processing going on but it should resemble the functionality
   //
-  // This function takes 3 arguments to complete
+  // This function takes 3 arguments:
+  // ccNumber: Credit Card number for validation & processing
+  // cvcNumber: Credit Card Security Number
+  // expiry: Credit Card expiry Date
+  // total: Total dollars to be charged on card
   //--------------------------------------------------------------------
 
   // Validate Credit Card number...
@@ -91,12 +95,12 @@ exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
       error: 'Invalid Card, could not process.'
     };
   }
-  // Process Payment ----------------------------------------
+  // [Process Payment] ---------------------------------------------------------
   // In this step we would usually communicate with a payment provider
   // exchange tokens and CC information via encrypted connection
   // For the purposes of this test lets pretend that is what is happening here....
   function processPayment(ccNumber, cvcNumber, expiry, total) {
-    // testing flag, you can set to FALSE to get an error as if the payment processor failed.
+    // TESTING FLAG , you can set to FALSE to get an error as if the payment processor failed.
     let processorResponse = true;
     // We would take the payload here and make some sort of object..
     // Keys here are made up.. would be based on payment processor docs..
