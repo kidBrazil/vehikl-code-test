@@ -1,10 +1,16 @@
 <template lang="pug">
   //- Wrapper Container
   section.blk-main-content.u-text-center
-    //- Hero
-    hero-main
-    //- Main Footer
-    main-footer
+    h1
+      |Parking Lot App
+
+    section.blk-issue-tickets
+      h2
+        |Issue New Tickets
+      button.blk-base-btn(v-on:click="getTicket")
+        |Get Ticket
+      .blk-ticket(v-if="ticket")
+        |Your Ticket number is {{ticket}}
 </template>
 
 
@@ -13,9 +19,9 @@
 <script>
 
 //Local Component registration
-import HeroMain           from './hero-main.vue';
-import MainFooter   from '../shared/main-footer.vue';
-import TestDiv   from '../modules/sixty-forty.vue';
+
+// Import Axios:
+import axios from 'axios';
 // Import SEO From File
 import { stagingBuild, template, social, general }       from '../../seo-meta.js';
 
@@ -25,7 +31,7 @@ export default{
 
   data: function(){
     return {
-
+      ticket: false,
     };
   },
   // Meta SEO Function
@@ -45,11 +51,11 @@ export default{
     };
   },
 
-  components: {
-    'hero-main'         : HeroMain,
-    'main-footer'       : MainFooter,
-    'test-div'          : TestDiv
-  }
+  methods: {
+    getTicket() {
+
+    }
+  },
 };
 </script>
 

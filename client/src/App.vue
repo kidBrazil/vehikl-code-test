@@ -1,30 +1,12 @@
 <template lang="pug">
   main(id="app")
-    //-Skip Navigatio Accessbility
-    button(href="#mainContent"
-      title="Skip to main content"
-      aria-label="Skip to main content"
-      v-on:click.stop.prevent="skipNav"
-      class="blk-skipnav" tabindex="0")
-        |Skip To Main Content
-
-    //- Main Navigation
-    main-navigation
     //- Transition Wrapper
     transition(name="fade")
       //- Router View
       router-view
-    // Cookies
-    cookie-popup(
-      :active="showCookies"
-      v-if="cookies"
-      v-on:dismiss="cookies = false")
 </template>
 
 <script>
-//Local Component registration
-import MainNavigation from './components/shared/navigation.vue';
-import CookiePopup    from './components/shared/cookies.vue';
 // Import SEO From File
 import { stagingBuild, template, social, general }       from './seo-meta.js';
 
@@ -67,26 +49,6 @@ export default {
     };
   },
 
-  created: function(){
-    // [ PRERENDERER CAVEATS ] -----------------------------
-    // Prerenderers are great cuz SEO... but they suck at handling
-    // script injection from trackers.
-    // To solve the problem, we prevent the scripts from being loaded.
-    //
-    // __PRERENDER_INJECTED is a window object that only gets added by
-    // the prerenderer. These async calls will only execute on the intended
-    // client side environment.
-    if (!window.__PRERENDER_INJECTED) {
-      // Load Google Maps - TODO Update API Key with new one for this project
-      this.asyncScript( 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAo2PdZvAAXRAzbgx_x5YT2jKhQH50DsY0', true, true);
-      // Load Google Tag Manager
-      this.asyncScript( 'https://www.googletagmanager.com/gtag/js?id=UA-XXXXXXXX-1', true, true);
-      this.asyncScript( '/js/googletag.js', false, false);
-      // Load Facebook Pixel
-      this.asyncScript( '/js/fbpixel.js', false, false);
-    }
-  },
-
   mounted: function(){
     // Wait for full load and next tic on VM
     this.$nextTick(() => {
@@ -95,20 +57,6 @@ export default {
       if (window.__PRERENDER_INJECTED) {
         document.dispatchEvent(new Event('spa-rendered'));
       }
-      else {
-        // Track event on Facebook
-        if ( window.fbq ) {
-          window.fbq('track', 'PageView');
-        }
-        else {
-          console.log('Fb pixel not initialized');
-        }
-      }
-
-      // Check Cookies
-      setTimeout(() => {
-        this.checkCookie();
-      }, 5000);
 
       // [ FANCY CONSOLE OUTPUT ] --------------------------
       // each %c allows you to create a styling block
@@ -134,57 +82,15 @@ export default {
     if (window.__PRERENDER_INJECTED) {
       document.dispatchEvent(new Event('spa-rendered'));
     }
-    else {
-      // Track event on Facebook
-      if ( window.fbq ) {
-        window.fbq('track', 'PageView');
-      }
-      else {
-        console.log('Fb pixel not initialized');
-      }
-    }
-  },
-
-  components: {
-    'main-navigation' : MainNavigation,
-    'cookie-popup'    : CookiePopup
   },
 
   methods: {
     skipNav() {
       this.scrollToHash('#mainContent', 50);
-    },
-    // Check Cookies & Show Popup
-    checkCookie() {
-      // Poll local storage for data
-      var cookie = localStorage.getItem('acceptCookie');
-      var expiration = localStorage.getItem('cookieExpiration');
-
-      // Destroy Records
-      var destroyTokens = () => {
-        localStorage.removeItem('acceptCookie');
-        localStorage.removeItem('cookieExpiration');
-        // Show Cookie Prompt
-        this.cookies = true;
-        setTimeout( () => {
-          this.showCookies = true;
-        }, 800);
-      };
-
-      // If either Cookie or Expiration is missing...
-      if ( !cookie || !expiration ) {
-        destroyTokens();
-      }
-      // If token is expired..
-      else if ( Date.now() > parseInt(expiration) ) {
-        destroyTokens();
-      }
     }
   }
 };
 </script>
-
-
 
 <style lang="scss">
 
