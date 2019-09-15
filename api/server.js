@@ -11,7 +11,7 @@ var express = require('express'),
 // Loading Mongoose
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', true);
-mongoose.connect('mongodb://localhost/TestLot003');
+mongoose.connect('mongodb://localhost/TestLot005');
 
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));

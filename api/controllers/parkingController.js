@@ -5,6 +5,8 @@ var mongoose = require('mongoose'),
   Capacity = mongoose.model('Capacity'),
   Tickets = mongoose.model('Tickets');
 
+var helpers = require('../helpers/helpers');
+
 // Issue Ticket function --------------------------------------------
 // This endpoint will trigger a call to the database to
 // check if there are any available spots. If there are available
@@ -33,7 +35,7 @@ exports.issue_ticket = function(req, res) {
       lotId = capacity[0].id;
       baseRate = capacity[0].base_rate;
       // Check if there are still spots free..
-      (spots - takenSpots > 0 ) ? createTicket() : denyTicket();
+      (spots - takenSpots > 0 ) ? createTicket(lotId, baseRate) : denyTicket();
       console.log('[ CHECKING VACANCY ] ----------------------------');
       console.log('Capacity:' + spots);
       console.log('Spots Taken:' + takenSpots);
@@ -41,13 +43,14 @@ exports.issue_ticket = function(req, res) {
   });
 
   // Create Ticket Funcion ------------------------------------------
-  function createTicket() {
+  function createTicket(parkingLot, rate) {
     // Model Ticket - We only need creation time at this stage
     var ticket = new Tickets({
       // Could potentially add other data here in the future,
       // license plate from a reader.. that type of thing.
       created: Date.now(),
-      ticket_rate: baseRate
+      ticket_rate: rate,
+      lot_id: parkingLot
     });
     // Save ticket to DB
     ticket.save(function (err, ticket) {
@@ -58,7 +61,7 @@ exports.issue_ticket = function(req, res) {
       else {
         // Success...
         // Update capcity count of spots taken.
-        Capacity.update( lotId ,
+        Capacity.updateOne( lotId ,
           {
             $inc: { spots_alocated: 1 }
           },
@@ -85,7 +88,7 @@ exports.issue_ticket = function(req, res) {
   }
 };
 
-exports.total_owed = function(req, res) {
+exports.pay_ticket = function(req, res) {
   // Issue Ticket function --------------------------------------------
   // This endpoint will trigger a call to the database
   // to determine when the ticket was created.
@@ -94,9 +97,14 @@ exports.total_owed = function(req, res) {
   // The endpoint will then return the amount owed in dollars.
   //--------------------------------------------------------------------
 
-  // Variables
+  // Variables -- In a real world scenario ticket number would be validated.
   let ticketId = req.params.ticket,
-      requestTime = Date.now();
+      requestTime = Date.now(),
+      totalOwed = null,
+      lotId = null,
+      // Flag for checking if ticket was previously paid
+      ticketPaid = false,
+      reqUrl = req.url;
   // Get current Lot Capacity ------------------------------------
   // Will set vacancy to true/false based on capcity left.
   Tickets.find({_id: ticketId}, function(err, ticket) {
@@ -112,45 +120,98 @@ exports.total_owed = function(req, res) {
       // Success
       createdTime = ticket[0].created;
       ticketRate = ticket[0].ticket_rate;
-      // Calculate the rate.
-      res.json({ total: calculateRate( ticketRate, createdTime, requestTime ) });
+      lotId = ticket[0].lot_id;
+      ticketPaid = ticket[0].paid;
+
+      // Respond to Ticket URI.
+      if ( reqUrl.indexOf('tickets') > -1) {
+        // If ticket is already paid.. return 0
+        if ( ticketPaid ) {
+          res.json(
+            {
+              total: 0
+            }
+          );
+        }
+        else {
+          // Calculate the rate.
+          totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
+          // Return response.
+          res.json(
+            {
+              total: totalOwed
+            }
+          );
+        }
+      }
+      // Respond to Payments
+      else if (reqUrl.indexOf('payments') > -1) {
+        // If ticket already paid..
+        if ( ticketPaid ) {
+          // Return response..
+          res.json({ message: 'Ticket is already Paid.' });
+        }
+        else {
+          // Check that the request contains something in the body..
+          if (Object.keys(req.body).length > 0) {
+            // Variables
+            let ccNumber = req.body.cc_number,
+                cvcNumber = req.body.cc_cvc,
+                expiry = req.body.cc_expiry;
+            // Process Payment
+            let paymentResponse = helpers.process_payment(ccNumber, cvcNumber, expiry, totalOwed);
+            // Check response and update capacity...
+            if (paymentResponse.processed) {
+              // Success...
+              // Update capcity count of spots taken.
+              Capacity.updateOne( {_id: lotId} ,
+                {
+                  $inc: { spots_alocated: -1 }
+                },
+                {new: true},
+                function (err, capacity) {
+                  if (err){
+                     return console.error(err);
+                  }
+                  else {
+                    console.log('Updated Lot Capcity...');
+                  }
+                }
+              );
+              // Update Ticket...
+              Tickets.updateOne( {_id: ticketId},
+                {
+                  paid: true,
+                  paid_on: Date.now()
+                },
+                {new: true},
+                function (err, capacity) {
+                  if (err){
+                     return console.error(err);
+                  }
+                  else {
+                    console.log('Updated Ticket...');
+                  }
+                }
+              );
+            }
+            // Return response object...
+            res.json({
+              payment_fullfilled: paymentResponse.processed,
+              payment_error: paymentResponse.error
+            });
+          }
+          else {
+            console.error('Request Body is missing.');
+            res.json({ message: 'Request Body is missing.' });
+          }
+        }
+      }
+      // Catch All..
+      else {
+        console.error('Invalid URL, please review and try again.');
+        res.json({ message: 'Invalid URL, please review and try again.' });
+      }
     }
   });
-
-  // Calculate The Rate ....
-  function calculateRate(rate, created, requested) {
-    // Calculate Rate Function ----------------------------------------
-    // Takes in 3 arguments in order to calculate the amount owed by the client.
-    //
-    // rate: Comes directly from the ticket and represents the dollars / hour cost.
-    // created: Receives date from database in Timestamp so must be converted to millis.
-    // requested: Comes in as standard millis ready to calculate.
-    var total = null;
-    // Convert Created to Millis.
-    created = created.getTime();
-    // Get the difference in time in minutes
-    let delta = Math.ceil( (requested - created) / 60000);
-    let rateMinute = rate / 60;
-
-
-    // Over 1 Hour...Less than 3
-    if ( delta > 60 && delta < 119 ) {
-      rateMinute = (rateMinute * 1.5);
-    }
-    // Over 3 Hours...Less than 6
-    else if ( delta >= 120 && delta < 360) {
-      rateMinute = (rateMinute * 2.25)
-    }
-    // All Day
-    else if ( delta > 361) {
-      rateMinute = (rateMinute * 3.5)
-    }
-    // Return Total...
-    return total = (delta * rateMinute).toFixed(2);
-  }
-};
-
-exports.pay_ticket = function(req, res) {
-  console.log('Ticked Paid');
-  res.json({ message: 'Ticked Paid' });
 };

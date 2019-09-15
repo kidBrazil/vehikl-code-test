@@ -16,6 +16,9 @@ var IssuedTicket = new Schema({
     type: Date,
     default: null
   },
+  lot_id: {
+    type: String
+  },
   ticket_rate: {
     type: Number,
     default: 3

@@ -8,7 +8,7 @@ module.exports = function(app) {
 
   // Return Amount Owed Endpoint
   app.route('/tickets/:ticket')
-    .get(parkingController.total_owed);
+    .get(parkingController.pay_ticket);
 
   // Pay Ticket Endpoint
   app.route('/payments/:ticket')
