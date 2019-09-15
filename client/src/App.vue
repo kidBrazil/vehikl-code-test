@@ -176,24 +176,10 @@ body::-webkit-scrollbar-thumb {
 
 
 ::selection {
-  background: $color-brand-accent;
+  background: $color-brand-primary;
 }
 ::-moz-selection {
-  background: $color-brand-accent;
+  background: $color-brand-primary;
 }
-
-h1.u-c-primary::selection,
-h2.u-c-primary::selection,
-h3.u-c-primary::selection,
-h4.u-c-primary::selection {
-  background: $color-brand-bkg;
-}
-h1.u-c-primary::-moz-selection,
-h2.u-c-primary::-moz-selection,
-h3.u-c-primary::-moz-selection,
-h4.u-c-primary::-moz-selection {
-  background: $color-brand-bkg;
-}
-
 /* stylelint-enable */
 </style>

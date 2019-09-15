@@ -11,7 +11,7 @@
 // TODO - Replace blackmesa-BTN
 .blk-base-btn {
   width: auto;
-  padding: 10px;
+  padding: 15px;
   display: inline-block;
   text-transform: uppercase;
   font-weight: 500;
@@ -19,34 +19,18 @@
   transition: all .4s;
   position: relative;
   vertical-align: middle;
+  background: $color-brand-primary;
+  color: $white;
+  appearance: none;
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0);
 
-  &:before,
-  &:after {
-    @include pseudo();
-    width: 100%;
-    height: 100%;
-  }
-
-  &:before {
-    top: 0;
-    left: 0;
-  }
-
-  &:after {
-    bottom: 0;
-    right: 0;
-  }
-
-  @media #{$portrait} {
-    padding: 15px 20px;
-  }
-
-  @media #{$tablet-lnd-only} {
-    padding: 10px 15px;
-  }
-
-  @media #{$phone-only} {
-    padding: 8px 10px;
-    letter-spacing: 1px;
+  &:hover,
+  &:focus,
+  &:active {
+    transform: scale3d(1.1, 1.1, 1.1);
+    box-shadow: 4px 4px 10px rgba(0,0,0,.5);
   }
 }

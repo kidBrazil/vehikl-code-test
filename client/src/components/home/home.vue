@@ -235,8 +235,8 @@ export default{
 /--------------------------------------*/
 .blk-main-content {
   background: #f2f2f2;
-  width: 90%;
-  @include center(both);
+  width: 100%;
+  margin: 0 auto;
 
   h1 {
     width: 100%;
@@ -263,6 +263,10 @@ export default{
   padding: 25px 10px;
   box-shadow: 5px 5px 10px rgba(0,0,0,.4);
   color: #5d5d5d;
+
+  @media #{$portrait} {
+    width: 80%;
+  }
 }
 
 .blk-section {
@@ -278,6 +282,29 @@ export default{
   margin-bottom: -20px;
   color: $white;
   font-size: 18px;
+}
+
+.blk-input-group {
+  width: 80%;
+  margin: 20px auto;
+
+  @media #{$landscape} {
+    width: 50%;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+    border: 2px solid $color-brand-primary;
+  }
+
+  .blk-input-label {
+    width: 100%;
+    text-align: left;
+    font-size: 25px;
+  }
 }
 
 /*--------------------------------------*/
