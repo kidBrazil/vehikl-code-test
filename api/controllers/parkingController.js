@@ -44,7 +44,6 @@ exports.issue_ticket = function(req, res) {
 
   // Create Ticket Funcion ------------------------------------------
   function createTicket(parkingLot, rate) {
-    console.log('CREATING Ticket');
     // Model Ticket - We only need creation time at this stage
     var ticket = new Tickets({
       // Could potentially add other data here in the future,
@@ -103,6 +102,8 @@ exports.pay_ticket = function(req, res) {
       requestTime = Date.now(),
       totalOwed = null,
       lotId = null,
+      // Flag for checking if ticket was previously paid
+      ticketPaid = false,
       reqUrl = req.url;
   // Get current Lot Capacity ------------------------------------
   // Will set vacancy to true/false based on capcity left.
@@ -120,72 +121,90 @@ exports.pay_ticket = function(req, res) {
       createdTime = ticket[0].created;
       ticketRate = ticket[0].ticket_rate;
       lotId = ticket[0].lot_id;
-      // Calculate the rate.
-      totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
+      ticketPaid = ticket[0].paid;
 
       // Respond to Ticket URI.
       if ( reqUrl.indexOf('tickets') > -1) {
-        res.json(
-          {
-            total: totalOwed
-          }
-        );
+        // If ticket is already paid.. return 0
+        if ( ticketPaid ) {
+          res.json(
+            {
+              total: 0
+            }
+          );
+        }
+        else {
+          // Calculate the rate.
+          totalOwed = helpers.calculate_rate( ticketRate, createdTime, requestTime );
+          // Return response.
+          res.json(
+            {
+              total: totalOwed
+            }
+          );
+        }
       }
       // Respond to Payments
       else if (reqUrl.indexOf('payments') > -1) {
-        // Check that the request contains something in the body..
-        if (Object.keys(req.body).length > 0) {
-          // Variables
-          let ccNumber = req.body.cc_number,
-              cvcNumber = req.body.cc_cvc,
-              expiry = req.body.cc_expiry;
-          // Process Payment
-          let paymentResponse = helpers.process_payment(ccNumber, cvcNumber, expiry, totalOwed);
-          // Check response and update capacity...
-          if (paymentResponse.processed) {
-            // Success...
-            // Update capcity count of spots taken.
-            Capacity.update( lotId ,
-              {
-                $inc: { spots_alocated: -1 }
-              },
-              {new: true},
-              function (err, capacity) {
-                if (err){
-                   return console.error(err);
-                }
-                else {
-                  console.log('Updated Lot Capcity...');
-                }
-              }
-            );
-            // Update Ticket...
-            Tickets.update( ticketId ,
-              {
-                paid: true,
-                paid_on: Date.now()
-              },
-              {new: true},
-              function (err, capacity) {
-                if (err){
-                   return console.error(err);
-                }
-                else {
-                  console.log('Updated Ticket...');
-                }
-              }
-            );
-          }
-
-          // Return response object...
-          res.json({
-            payment_fullfilled: paymentResponse.processed,
-            payment_error: paymentResponse.error
-          });
+        // If ticket already paid..
+        if ( ticketPaid ) {
+          // Return response..
+          res.json({ message: 'Ticket is already Paid.' });
         }
         else {
-          console.error('Request Body is missing.');
-          res.json({ message: 'Request Body is missing.' });
+          // Check that the request contains something in the body..
+          if (Object.keys(req.body).length > 0) {
+            // Variables
+            let ccNumber = req.body.cc_number,
+                cvcNumber = req.body.cc_cvc,
+                expiry = req.body.cc_expiry;
+            // Process Payment
+            let paymentResponse = helpers.process_payment(ccNumber, cvcNumber, expiry, totalOwed);
+            // Check response and update capacity...
+            if (paymentResponse.processed) {
+              // Success...
+              // Update capcity count of spots taken.
+              Capacity.updateOne( {_id: lotId} ,
+                {
+                  $inc: { spots_alocated: -1 }
+                },
+                {new: true},
+                function (err, capacity) {
+                  if (err){
+                     return console.error(err);
+                  }
+                  else {
+                    console.log('Updated Lot Capcity...');
+                  }
+                }
+              );
+              // Update Ticket...
+              Tickets.updateOne( {_id: ticketId},
+                {
+                  paid: true,
+                  paid_on: Date.now()
+                },
+                {new: true},
+                function (err, capacity) {
+                  if (err){
+                     return console.error(err);
+                  }
+                  else {
+                    console.log('Updated Ticket...');
+                  }
+                }
+              );
+            }
+            // Return response object...
+            res.json({
+              payment_fullfilled: paymentResponse.processed,
+              payment_error: paymentResponse.error
+            });
+          }
+          else {
+            console.error('Request Body is missing.');
+            res.json({ message: 'Request Body is missing.' });
+          }
         }
       }
       // Catch All..

@@ -14,7 +14,7 @@ exports.calculate_rate = function(rate, created, requested) {
   let delta = Math.ceil( (requested - created) / 60000);
   let rateMinute = rate / 60;
 
-
+  // [ Rate Calculations ] -----------------------------
   // Over 1 Hour...Less than 3
   if ( delta > 60 && delta < 119 ) {
     rateMinute = (rateMinute * 1.5);
