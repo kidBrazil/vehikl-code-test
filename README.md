@@ -23,6 +23,28 @@ npm install
 
 # Run local instance of Vue Client (://localhost:8080)
 npm run dev
+
+```
+
+## Running Project Docker
+If you prefer you can test the application with Docker if you already have it
+installed on your machine.
+
+```bash
+# Inside of /vehikl-code-test/
+
+docker-compose up --build
+
+# Inside of /vehikl-code-test/client
+# Login to NPM
+npm login
+
+# Install Dependencies
+npm install
+
+# Run local instance of Vue Client (://localhost:8080)
+npm run dev
+
 ```
 
 ## Deploying project online
