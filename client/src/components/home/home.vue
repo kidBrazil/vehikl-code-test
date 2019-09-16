@@ -4,7 +4,7 @@
     h1.u-uppercase
       |Parking Lot App
 
-    //- Issue New Tickets
+    //- [Issue New Tickets] ---------------------------------------------------
     section.blk-section
       h3.u-uppercase
         |Issue New Tickets
@@ -15,7 +15,8 @@
       .blk-repsponse(v-if="message")
         |{{message}}
 
-    //- Check Total Owed
+    //- [Total Owed] ----------------------------------------------------------
+    //- Ticket Number shares a model with the payment form as well
     section.blk-section
       h3.u-uppercase
         |Check Total Owed:
@@ -29,19 +30,19 @@
           name="Ticket Number"
           aria-required="true"
           aria-label="Enter Ticket Number"
-          placeholder="Ticket #:"
-          )
+          placeholder="Ticket #:")
+
       button.blk-base-btn(v-on:click.prevent="getTotal")
         |Get Total
 
       .blk-repsponse(v-if="total")
         |Your Total is: ${{total}}
 
-    //- Pay Card
+    //- [Pay Total] ----------------------------------------------------------
     section.blk-section
       h3.u-uppercase
         |Pay Ticket:
-
+      //- Ticket Number (Shares model with Total Owed)
       .blk-input-group
         .blk-input-label
           |Enter Ticket Number:
@@ -52,9 +53,8 @@
           name="Ticket Number"
           aria-required="true"
           aria-label="Enter Ticket Number"
-          placeholder="Ticket #:"
-          )
-
+          placeholder="Ticket #:")
+      //- Credit card number
       .blk-input-group
         .blk-input-label
           |Credit Card:
@@ -65,9 +65,8 @@
           name="Ticket Number"
           aria-required="true"
           aria-label="Enter Credit Card Number"
-          placeholder="Credit Card Number:"
-          )
-
+          placeholder="Credit Card Number:")
+      //- Credit card Expiry
       .blk-input-group
         .blk-input-label
           |Expiry Date:
@@ -78,9 +77,8 @@
           name="Ticket Number"
           aria-required="true"
           aria-label="Enter Ticket Number"
-          placeholder="Expiry Date (MMYY)"
-          )
-
+          placeholder="Expiry Date (MMYY)")
+      //- Credit card Security
       .blk-input-group
         .blk-input-label
           |CVC Number:
@@ -91,8 +89,7 @@
           name="Ticket Number"
           aria-required="true"
           aria-label="Enter CVC Number"
-          placeholder="CVC"
-          )
+          placeholder="CVC")
 
       button.blk-base-btn(v-on:click.prevent="payTicket")
         |Pay Ticket
@@ -101,9 +98,6 @@
 </template>
 
 <script>
-
-//Local Component registration
-
 // Import Axios:
 import axios from 'axios';
 // Import SEO From File
@@ -111,7 +105,6 @@ import { stagingBuild, template, social, general }       from '../../seo-meta.js
 
 export default{
   name: 'HomePage',
-  // TODO - Edit meta Title
 
   data: function(){
     return {
