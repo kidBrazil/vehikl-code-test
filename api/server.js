@@ -11,7 +11,7 @@ var express = require('express'),
 // Loading Mongoose
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', true);
-mongoose.connect('mongodb://localhost:27017/ParkingLotSequoia', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost:27017/ParkingLotSequoia123123312312', { useNewUrlParser: true });
 mongoose.set('useUnifiedTopology', true);
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,7 +29,7 @@ app.use(function(req, res) {
 });
 
 // Open Ports
-app.listen(port);
+let server = app.listen(port);
 
 // Check for Parking lot Initialization
 Capacity.find({}, function(err, capacity) {
