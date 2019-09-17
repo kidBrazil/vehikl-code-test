@@ -74,10 +74,11 @@ exports.process_payment = function(ccNumber, cvcNumber, expiry, total) {
     if (regEx.test(ccNumber)) {
       // Flip flag to true
       validCard = true;
+      console.error('Card Matches' + cardModels[i].cardType);
     }
     else {
       // Leave flag as false...
-      console.error('Invalid CC Number');
+      console.error('Card did not match' + cardModels[i].cardType);
     }
   }
   // If valid... Call Payment processor and make exchange

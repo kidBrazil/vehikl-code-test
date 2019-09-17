@@ -4,12 +4,6 @@
 var helpers = require('../helpers/helpers');
 var assert = require('assert');
 
-// Test Calculate Rate
-describe('Caulcualte Rate', function(){
-
-
-});
-
 // Test payment processing:
 // As this is a mock process, we are only expecting a TRUE.
 describe('Caulcualte Rate', function(){
@@ -33,7 +27,7 @@ describe('Caulcualte Rate', function(){
     assert.equal(helpers.calculate_rate(3, Date.now(), (Date.now() + 8400000)), 15.75);
   });
   // All Day
-  it('Should return $15.75 for a 450 minute stay', function(){
+  it('Should return $78.75 for a 450 minute stay', function(){
     assert.equal(helpers.calculate_rate(3, Date.now(), (Date.now() + 27000000)), 78.75);
   });
 });
