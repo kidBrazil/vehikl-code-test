@@ -40,9 +40,13 @@ describe('Test Server Endpoints', function(done) {
         response.body.should.have.property('created');
         response.body.should.have.property('lot_id');
         response.body.should.have.property('_id');
+        expect(response.body.paid).to.equal(false);
+        expect(response.body.paid_on).to.equal(null);
+        // Check that ID matches Mongo schema
+        response.body.should.have.property('_id').and.to.match(/^[a-f\d]{24}$/i);
 
+        // Store generated ticket for future tests
         generatedTicket = response.body._id;
-        console.log(generatedTicket);
         done();
       });
     })
