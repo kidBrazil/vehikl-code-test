@@ -11,6 +11,12 @@ let mongoose = require('mongoose'),
 
 chai.use(chaiHttp);
 
+let fakeTransaction = {
+  cc_number: 4520343422224444,
+  cc_cvc: 123,
+  cc_expiry: 1122
+}
+
 describe('Test Server Endpoints', function(done) {
   // Generate Ticket Endpoint
   describe('[POST] /tickets', function() {
@@ -44,7 +50,6 @@ describe('Test Server Endpoints', function(done) {
 
   // Return Ticket Total
   describe('[GET] /tickets/:ticket', function() {
-
     // Test the ticket..
     it('Gets the ticket total', (done) => {
       chai.request('localhost:3000').get('/tickets/' + generatedTicket).send({})
@@ -53,11 +58,32 @@ describe('Test Server Endpoints', function(done) {
           done(err);
         }
         // Check that the backend responded..
-        console.log(response);
         response.should.have.status(200);
         response.should.be.json;
         response.body.should.be.a('object');
         response.body.should.have.property('total');
+        done();
+      });
+    })
+  });
+
+  // Pay Ticket
+  describe('[POST] /payments/:ticket', function() {
+    // Test the ticket..
+    it('Submits payment on ticket', (done) => {
+      chai.request('localhost:3000').post('/payments/' + generatedTicket)
+      .send(fakeTransaction)
+      .end((err, response) => {
+        if (err) {
+          done(err);
+        }
+        // Check that the backend responded..
+        response.should.have.status(200);
+        response.should.be.json;
+        response.body.should.be.a('object');
+        response.body.should.have.property('payment_fullfilled');
+        response.body.should.have.property('payment_error');
+        response.body.should.have.property('payment_total');
         done();
       });
     })

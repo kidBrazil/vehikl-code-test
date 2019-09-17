@@ -29,7 +29,9 @@ app.use(function(req, res) {
 });
 
 // Open Ports
-let server = app.listen(port);
+let server = app.listen(3000);
+// Export Server..
+module.exports = server;
 
 // Check for Parking lot Initialization
 Capacity.find({}, function(err, capacity) {
