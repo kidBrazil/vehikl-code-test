@@ -84,6 +84,7 @@ describe('Test Server Endpoints', function(done) {
         response.body.should.have.property('payment_fullfilled');
         response.body.should.have.property('payment_error');
         response.body.should.have.property('payment_total');
+        expect(response.body.payment_fullfilled).to.equal(true);
         done();
       });
     })
