@@ -11,8 +11,8 @@ var express = require('express'),
 // Loading Mongoose
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', true);
-mongoose.connect('mongodb://mongo:27017/ParkingLotSequoia');
-
+mongoose.connect('mongodb://localhost:27017/ParkingLotSequoia', { useNewUrlParser: true });
+mongoose.set('useUnifiedTopology', true);
 // Configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

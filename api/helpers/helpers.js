@@ -8,8 +8,7 @@ exports.calculate_rate = function(rate, created, requested) {
   // created: Receives date from database in Timestamp so must be converted to millis.
   // requested: Comes in as standard millis ready to calculate.
   var total = null;
-  // Convert Created to Millis.
-  created = created.getTime();
+
   // Get the difference in time in minutes
   let delta = Math.ceil( (requested - created) / 60000);
   let rateMinute = rate / 60;

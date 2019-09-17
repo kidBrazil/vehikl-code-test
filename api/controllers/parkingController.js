@@ -120,6 +120,8 @@ exports.pay_ticket = function(req, res) {
     else {
       // Success
       createdTime = ticket[0].created;
+      // Convert to millis
+      createdTime = createdTime.getTime();
       ticketRate = ticket[0].ticket_rate;
       lotId = ticket[0].lot_id;
       ticketPaid = ticket[0].paid;
